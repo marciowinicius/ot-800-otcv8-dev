@@ -1,0 +1,13 @@
+{
+    "name": "pkl-otcv8",
+    "version": "1.0.0",
+    "builtin-baseline": "761c81d43335a5d5ccc2ec8ad90bd7e2cbba734e",
+    "dependencies": [
+        "boost-asio", "boost-beast", "boost-filesystem", "boost-iostreams", "boost-lockfree", "boost-process",
+        "boost-system", "boost-uuid", "boost-variant", "bzip2", "glew", "libogg", "libvorbis", "libzip", "openal-soft",
+        "opengl", "zlib", "physfs", "luajit", "discord-rpc"
+    ],
+    "overrides": [
+        { "name": "boost", "version": "1.76.0" }
+    ]
+}
