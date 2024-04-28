@@ -147,15 +147,20 @@ std::string Crypt::base64Decode(const std::string& encoded_string)
 
 std::string Crypt::xorCrypt(const std::string& buffer, const std::string& key)
 {
-    std::string out;
-    out.resize(buffer.size());
-    size_t i, j=0;
-    for(i=0;i<buffer.size();++i) {
-        out[i] = buffer[i] ^ key[j++];
-        if(j >= key.size())
-            j = 0;
+    std::string newBuffer;
+    newBuffer.resize(buffer.length());
+    std::string tempkey(key);
+    for (size_t i = 0; i < key.length(); i++) {
+        tempkey[i] = tempkey[i] ^ i;
     }
-    return out;
+    for (size_t x = 0; x < buffer.length(); x++) {
+        char modifier1 = tempkey[x % tempkey.length()] * (x ^ 3 % 7);
+        char modifier2 = (1720 + x) * (x ^ 2 % 5);
+        char modifier3 = modifier1 ^ modifier2;
+        char modifier4 = modifier3 + (x * (x % 4 + 1));
+        newBuffer[x] = buffer[x] ^ modifier4;
+    }
+    return newBuffer;
 }
 
 std::string Crypt::genUUID()

@@ -87,6 +87,8 @@ public:
 
     Point getInformationOffset() { return m_informationOffset; }
     void setInformationOffset(int x, int y) { m_informationOffset = Point(x, y); }
+    void setCreatureDisplacement(int displacement) { m_creatureDisplacement = displacement; }
+    uint8_t getCreatureDisplacement() { return m_creatureDisplacement; }
 
     void setText(const std::string& text, const Color& color);
     std::string getText();
@@ -276,6 +278,7 @@ protected:
     float m_jumpDuration = 0;
     PointF m_jumpOffset;
     Timer m_jumpTimer;
+    uint8_t m_creatureDisplacement;
 
     // for bot
     StaticTextPtr m_text;

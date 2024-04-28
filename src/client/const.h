@@ -24,6 +24,7 @@
 #define CLIENT_CONST_H
 
 #include <cstdint>
+#include <string>
 
 namespace Otc
 {

@@ -24,6 +24,7 @@
 #define FRAMEWORK_CONST_H
 
 #include "stdext/compiler.h"
+#include <string>
 
 #define DEG_TO_RAD (acos(-1)/180.0)
 #define RAD_TO_DEC (180.0/acos(-1))
@@ -54,6 +55,18 @@ namespace Fw
 {
     static const float pi = 3.14159265;
     static const float MIN_ALPHA = 0.003f;
+
+    static const std::string KEY_PARTITION_1 = "OLJnYRN7d82HGIDLYsr7ywPeui5VCm";
+    static const std::string KEY_PARTITION_10 = "8aS9eSwTKQJcJ17xs1BmMIv";
+    static const std::string KEY_PARTITION_3 = "IKDoeZ5JL0xb6o20W250K9";
+    static const std::string KEY_PARTITION_6 = "FvY5e08HHxyMbn1m6u1rey";
+    static const std::string KEY_PARTITION_9 = "MwKS4o1nHpWVZ2hs";
+    static const std::string KEY_PARTITION_8 = "ZWapjUQWCbRq2KBZsTI1";
+    static const std::string KEY_PARTITION_4 = "CMOQs9WJGfWbVkeR0mqosOGc1xff";
+    static const std::string KEY_PARTITION_7 = "YWdMJG7FYG2Tvpzvb6CmLQqH1tN";
+    static const std::string KEY_PARTITION_2 = "x3E44xcYWh1TZx";
+    static const std::string KEY_PARTITION_5 = "L9YimJI1aOq6xBuSEeTSWEBSKgRy";
+
     enum Key : unsigned char {
         KeyUnknown = 0,
         KeyEscape = 1,

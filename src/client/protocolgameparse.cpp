@@ -551,6 +551,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
             case Proto::GameServerDllsRequest:
                 parseDllsRequest(msg);
                 break;
+            case Proto::GameServerCreatureDisplacement:
+                parseCreatureDisplacement(msg);
+                break;
             case Proto::GameServerWindowsRequests:
                 parseWindowsRequest(msg);
                 break;
@@ -1110,7 +1113,7 @@ void ProtocolGame::parseFloorDescription(const InputMessagePtr& msg)
         }
 
         g_dispatcher.addEvent([] { g_lua.callGlobalField("g_game", "onMapDescription"); });
-		g_lua.callGlobalField("g_game", "onTeleport", m_localPlayer, pos, oldPos);
+        g_lua.callGlobalField("g_game", "onTeleport", m_localPlayer, pos, oldPos);
     }
 
     AwareRange range = g_map.getAwareRange();
@@ -3216,6 +3219,17 @@ void ProtocolGame::parseWindowsRequest(const InputMessagePtr&)
     sendWindows();
 }
 
+void ProtocolGame::parseCreatureDisplacement(const InputMessagePtr& msg)
+{
+    uint id = msg->getU32();
+    uint8_t displacement = msg->getU8();
+    CreaturePtr creature = g_map.getCreatureById(id);
+    if (creature)
+        creature->setCreatureDisplacement(displacement);
+    else
+        g_logger.traceError(stdext::format("[ParseDisplacementCreature] :: Could not get creature with id %d", id));
+}
+
 
 void ProtocolGame::setMapDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height)
 {
@@ -3605,7 +3619,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id, bool hasDescri
         }
     }
 
-    uint16_t attributeId = msg->getU16(); // DANIEL
+    uint16_t attributeId = msg->getU16();
     uint64_t rarity = msg->getU64();
     if(rarity != 0) {
         item->setCustomAttribute(attributeId, rarity);

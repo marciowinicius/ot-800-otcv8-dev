@@ -375,9 +375,20 @@ void ResourceManager::readFileStream(const std::string& fileName, std::iostream&
     out.seekg(0, std::ios::beg);
 }
 
+void ResourceManager::logMessage(const std::string &message) {
+#ifdef PROTECTION_LOG
+    std::ofstream logFile("encryptLog.txt", std::ios_base::app | std::ios_base::out);
+    if (logFile.is_open()) {
+        logFile << message << std::endl;
+        logFile.close();
+    }
+#endif
+}
+
 std::string ResourceManager::readFileContents(const std::string& fileName, bool safe)
 {
     std::string fullPath = resolvePath(fileName);
+    logMessage("Resolved path: " + fullPath);
     
     if (fullPath.find("/downloads") != std::string::npos) {
         auto dfile = g_http.getFile(fullPath.substr(10));
@@ -385,38 +396,105 @@ std::string ResourceManager::readFileContents(const std::string& fileName, bool 
             return std::string(dfile->response.begin(), dfile->response.end());
     }
 
+#ifndef CHECK_PROTECTION
     PHYSFS_File* file = PHYSFS_openRead(fullPath.c_str());
-    if(!file)
-        stdext::throw_exception(stdext::format("unable to open file '%s': %s", fullPath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+    if (!file) {
+        logMessage("Error: Unable to open file. Reason: " + std::string(PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+        stdext::throw_exception(stdext::format("Unable to open file '%s': %s", fullPath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+    }
 
     int fileSize = PHYSFS_fileLength(file);
     std::string buffer(fileSize, 0);
     PHYSFS_readBytes(file, (void*)&buffer[0], fileSize);
     PHYSFS_close(file);
 
-    if (safe) {
-        return buffer;
-    }
-
-    // skip decryption for bot configs
-    if (fullPath.find("/bot/") != std::string::npos) {
-        return buffer;
-    }
-
-    static std::string unencryptedExtensions[] = { ".otml", ".otmm", ".dmp", ".log", ".txt", ".dll", ".exe", ".zip" };
-
-    if (!decryptBuffer(buffer)) {
-        bool ignore = (m_customEncryption == 0);
-        for (auto& it : unencryptedExtensions) {
-            if (fileName.find(it) == fileName.size() - it.size()) {
-                ignore = true;
-            }
-        }
-        if(!ignore)
-            g_logger.fatal(stdext::format("unable to decrypt file: %s", fullPath));
-    }
-
     return buffer;
+
+#else
+    PHYSFS_File* file = PHYSFS_openRead(fullPath.c_str());
+    if (!file) {
+        logMessage("Error: Unable to open file. Reason: " + std::string(PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+        stdext::throw_exception(stdext::format("Unable to open file '%s': %s", fullPath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+    }
+
+    int fileSize = PHYSFS_fileLength(file);
+    logMessage("File size: " + std::to_string(fileSize));
+
+    std::string buffer(fileSize, 0);
+    PHYSFS_readBytes(file, (void*)&buffer[0], fileSize);
+    PHYSFS_close(file);
+
+    logMessage("File read successfully.");
+    
+#ifdef ENABLE_PROTECTION
+    bool headerFound = false;
+    std::string currentHeader;
+    std::vector<std::string> predefinedHeaders = {
+        "M4cT7y2",
+        "R5hV3x9",
+        "S1nL6d4",
+        "F8gZ2q5",
+        "U3jP5w0",
+        "G2tK4e7",
+        "O6pX1r3",
+        "I7vY3l5",
+        "C9qN2h4",
+        "W8sM1f7",
+        "Z4yT3k6",
+        "V7lR2j9",
+        "Q5pF1x8",
+        "Y3uH6m2",
+        "A4eW5z7",
+        "J2nD8c1",
+        "L5vG3x1",
+        "P4tB7q0",
+        "N6rH2k5",
+        "E9fU3y1"
+    };
+
+    for (const std::string& header : predefinedHeaders) {
+        if (buffer.size() >= header.size() && buffer.substr(0, header.size()) == header) {
+            headerFound = true;
+            currentHeader = header;
+            break;
+        }
+    }
+
+    bool specialFileOrFolder = false;
+    if (fullPath.find("/assets/") != std::string::npos || 
+        fullPath.find("/data/") != std::string::npos || 
+        fullPath.find("/layouts/") != std::string::npos || 
+        fullPath.find("/mods/") != std::string::npos || 
+        fullPath.find("/modules/") != std::string::npos || 
+        fullPath.substr(fullPath.find_last_of("/") + 1) == "otclientrc.lua" || 
+        fullPath.substr(fullPath.find_last_of("/") + 1) == "init.lua") {
+        specialFileOrFolder = true;
+    }
+
+    if (headerFound) {
+        logMessage("File identified as encrypted. Decrypting...");
+
+        std::string encryptedBuffer = buffer.substr(currentHeader.size());
+        std::string decryptedBuffer;
+        decryptedBuffer = g_crypt.xorCrypt(encryptedBuffer, (Fw::KEY_PARTITION_1 + Fw::KEY_PARTITION_2 + Fw::KEY_PARTITION_3 + Fw::KEY_PARTITION_4 + Fw::KEY_PARTITION_5 + Fw::KEY_PARTITION_6 + Fw::KEY_PARTITION_7 + Fw::KEY_PARTITION_8 + Fw::KEY_PARTITION_9 + Fw::KEY_PARTITION_10));
+        logMessage("Successfully decrypted. Now decompressing...");
+
+        std::string decompressedBuffer;
+        decompressedBuffer = decompressString(decryptedBuffer);
+        logMessage("Decompression successful.");
+
+        return decompressedBuffer;
+    }
+    else if (!specialFileOrFolder) {
+        return buffer;
+    }
+    else {
+        return "";
+    }
+#else
+    return buffer;
+#endif
+#endif
 }
 
 bool ResourceManager::isFileEncryptedOrCompressed(const std::string& fileName)
@@ -575,7 +653,7 @@ std::string ResourceManager::resolvePath(std::string path)
 }
 
 std::string ResourceManager::guessFilePath(const std::string& filename, const std::string& type)
-{
+{    
     if(isFileType(filename, type))
         return filename;
     return filename + "." + type;
@@ -1145,4 +1223,80 @@ void ResourceManager::unmountMemoryData()
     m_memoryData = nullptr;
     m_loadedFromMemory = false;
     m_loadedFromArchive = false;
+}
+
+class ZStreamGuard {
+public:
+    ZStreamGuard(z_stream* zs) : zs_(zs) {}
+    ~ZStreamGuard() {
+        if (zs_) {
+            inflateEnd(zs_);
+        }
+    }
+
+private:
+    z_stream* zs_;
+};
+
+std::string ResourceManager::decompressString(const std::string& str)
+{
+    z_stream zs;
+    memset(&zs, 0, sizeof(zs));
+
+    if (inflateInit2(&zs, -MAX_WBITS) != Z_OK)
+        throw std::runtime_error("inflateInit failed while decompressing.");
+
+    ZStreamGuard guard(&zs);
+
+    zs.next_in = reinterpret_cast<Bytef*>(const_cast<char*>(str.data()));
+    zs.avail_in = str.size();
+
+    const size_t BLOCK_SIZE = 50 * 1024 * 1024;
+    std::vector<std::string> blocks;
+
+    int ret;
+    char outbuffer[32768];
+    std::string outstring;
+    outstring.reserve(BLOCK_SIZE);
+
+    do {
+        zs.next_out = reinterpret_cast<Bytef*>(outbuffer);
+        zs.avail_out = sizeof(outbuffer);
+
+        ret = inflate(&zs, 0);
+
+        size_t bytesDecompressed = sizeof(outbuffer) - zs.avail_out;
+        outstring.append(outbuffer, bytesDecompressed);
+
+        if (outstring.size() >= BLOCK_SIZE) {
+            blocks.push_back(std::move(outstring));
+            outstring.clear();
+            outstring.reserve(BLOCK_SIZE);
+        }
+
+    } while (ret == Z_OK);
+
+
+    if (!outstring.empty()) {
+        blocks.push_back(std::move(outstring));
+    }
+
+    if (ret != Z_STREAM_END) {
+        std::ostringstream oss;
+        oss << "Exception during zlib decompression: (" << ret << ") " << zs.msg;
+        throw(std::runtime_error(oss.str()));
+    }
+
+    size_t totalSize = 0;
+    for (const auto& block : blocks) {
+        totalSize += block.size();
+    }
+
+    std::string result;
+    result.reserve(totalSize);
+    for (const auto& block : blocks) {
+        result += block;
+    }
+
+    return result;
 }

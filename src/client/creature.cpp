@@ -85,7 +85,11 @@ void Creature::draw(const Point& dest, bool animate, LightView* lightView)
         return;
 
     const int sprSize = g_sprites.spriteSize();
-    Point jumpOffset = Point(m_jumpOffset.x, m_jumpOffset.y);
+    uint8_t drawCreatureDisplacement = m_creatureDisplacement;
+    if (!g_game.creatureDisplacementIsVisible()) {
+        drawCreatureDisplacement = 0;
+    }
+    Point jumpOffset = Point(m_jumpOffset.x + drawCreatureDisplacement, m_jumpOffset.y + drawCreatureDisplacement);
     Point creatureCenter = dest - jumpOffset + m_walkOffset - getDisplacement() + Point(sprSize / 2, sprSize / 2);
     drawBottomWidgets(creatureCenter, m_walking ? m_walkDirection : m_direction);
 
@@ -603,7 +607,9 @@ void Creature::updateWalk()
     uint8 walkedPixelsInNextFrame = std::max<uint8>(m_walkedPixels, totalPixelsWalkedInNextFrame);
 
     // update walk animation and offsets
-    updateWalkAnimation(totalPixelsWalked);
+    if (!g_game.creatureDisplacementIsVisible() || m_creatureDisplacement <= 0) {
+        updateWalkAnimation(m_walkedPixels);
+    }
     updateWalkOffset(m_walkedPixels);
     updateWalkOffset(walkedPixelsInNextFrame, true);
     updateWalkingTile();

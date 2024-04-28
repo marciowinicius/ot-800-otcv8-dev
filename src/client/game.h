@@ -399,6 +399,19 @@ public:
     uint getWalkId() { return m_walkId; }
     uint getWalkPreditionId() { return m_walkPrediction; }
 
+    int creatureDisplacementIsVisible() {return m_canSeeDisplacement;}
+    void setCreatureDisplacementIsVisible(bool value) {
+        m_canSeeDisplacement = value;
+    }
+    int creatureAurasIsVisible() {return m_canSeeAuras;}
+    void setCreatureAurasIsVisible(bool value) {
+        m_canSeeAuras = value;
+    }
+    int creatureWingsIsVisible() {return m_canSeeWings;}
+    void setCreatureWingsIsVisible(bool value) {
+        m_canSeeWings = value;
+    }
+
     void ignoreServerDirection(bool value) { m_ignoreServerDirection = value; }
     bool isIgnoringServerDirection()
     {
@@ -474,6 +487,9 @@ private:
     int m_coins;
     int m_transferableCoins;
 
+    bool m_canSeeDisplacement = true;
+    bool m_canSeeAuras = true;
+    bool m_canSeeWings = true;
     bool m_showRealDirection = false;
     bool m_ignoreServerDirection = true;
     bool m_tileThingsLuaCallback = false;

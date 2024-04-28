@@ -341,6 +341,9 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "setTibiaCoins", &Game::setTibiaCoins, &g_game);
     g_lua.bindSingletonFunction("g_game", "getTibiaCoins", &Game::getTibiaCoins, &g_game);
     g_lua.bindSingletonFunction("g_game", "getTransferableTibiaCoins", &Game::getTransferableTibiaCoins, &g_game);
+    g_lua.bindSingletonFunction("g_game", "setCreatureDisplacementIsVisible", &Game::setCreatureDisplacementIsVisible, &g_game);
+    g_lua.bindSingletonFunction("g_game", "setCreatureAurasIsVisible", &Game::setCreatureAurasIsVisible, &g_game);
+    g_lua.bindSingletonFunction("g_game", "setCreatureWingsIsVisible", &Game::setCreatureWingsIsVisible, &g_game);
 
     g_lua.bindSingletonFunction("g_game", "getMaxPreWalkingSteps", &Game::getMaxPreWalkingSteps, &g_game);
     g_lua.bindSingletonFunction("g_game", "setMaxPreWalkingSteps", &Game::setMaxPreWalkingSteps, &g_game);

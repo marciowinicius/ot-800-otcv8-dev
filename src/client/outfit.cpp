@@ -176,7 +176,9 @@ void Outfit::draw(Point dest, Otc::Direction direction, uint walkAnimationPhase,
                 wingAnimationPhase = (g_clock.millis() % (ticksPerFrame * phases)) / ticksPerFrame;
             }
         }
-        wingsType->draw(wingDest, 0, direction, 0, wingsZPattern, wingAnimationPhase, Color::white, lightView);
+        if (g_game.creatureWingsIsVisible()) {
+            wingsType->draw(wingDest, 0, direction, 0, wingsZPattern, wingAnimationPhase, Color::white, lightView);
+        }
     };
 
     Point auraDest = dest;
@@ -198,7 +200,9 @@ void Outfit::draw(Point dest, Otc::Direction direction, uint walkAnimationPhase,
                 auraAnimationPhase = (stdext::millis() / 75) % auraType->getAnimationPhases();
             }
         }
-        auraType->draw(auraDest, 0, direction, 0, auraZPattern, auraAnimationPhase, Color::white, lightView);
+        if (g_game.creatureAurasIsVisible()) {
+            auraType->draw(auraDest, 0, direction, 0, auraZPattern, auraAnimationPhase, Color::white, lightView);
+        }
     };
 
     Point topAuraDest = dest;
@@ -219,7 +223,9 @@ void Outfit::draw(Point dest, Otc::Direction direction, uint walkAnimationPhase,
                 auraAnimationPhase = (stdext::millis() / 75) % auraType->getAnimationPhases();
             }
         }
-        auraType->draw(topAuraDest, 1, direction, 0, 0, auraAnimationPhase, Color::white, lightView);
+        if (g_game.creatureAurasIsVisible()) {
+            auraType->draw(topAuraDest, 1, direction, 0, 0, auraAnimationPhase, Color::white, lightView);
+        }
     };
 
     if (m_aura && g_game.getFeature(Otc::GameBigAurasCenter)) {
@@ -234,46 +240,50 @@ void Outfit::draw(Point dest, Otc::Direction direction, uint walkAnimationPhase,
     }
 
     if (m_aura && (!g_game.getFeature(Otc::GameDrawAuraOnTop) or g_game.getFeature(Otc::GameAuraFrontAndBack)) ) {
-        drawAura();
+        if (g_game.creatureAurasIsVisible()) {
+            drawAura();
+        }
     }
   
     drawMount();
 
-    if (m_wings && (direction == Otc::South || direction == Otc::East)) {
-        auto wingsType = g_things.rawGetThingType(m_wings, ThingCategoryCreature);
-        if (wingsType) {
-            if (type->hasBones() && wingsType->hasBones()) {
-                auto outfitBones = type->getBones(direction);
-                auto outfitWidth = type->getWidth();
-                auto wingsWidth = wingsType->getWidth();
-                int bonusOffset = std::abs(wingsWidth - outfitWidth) * 32;
-                auto wingsBones = wingsType->getBones(direction);
-                auto boneOffset = Point((outfitBones.x - wingsBones.x) + bonusOffset, (outfitBones.y - wingsBones.y) + bonusOffset);
+    if (g_game.creatureWingsIsVisible()) {
+        if (m_wings && (direction == Otc::South || direction == Otc::East)) {
+            auto wingsType = g_things.rawGetThingType(m_wings, ThingCategoryCreature);
+            if (wingsType) {
+                if (type->hasBones() && wingsType->hasBones()) {
+                    auto outfitBones = type->getBones(direction);
+                    auto outfitWidth = type->getWidth();
+                    auto wingsWidth = wingsType->getWidth();
+                    int bonusOffset = std::abs(wingsWidth - outfitWidth) * 32;
+                    auto wingsBones = wingsType->getBones(direction);
+                    auto boneOffset = Point((outfitBones.x - wingsBones.x) + bonusOffset, (outfitBones.y - wingsBones.y) + bonusOffset);
 
-                if (m_mount > 0) {
-                    if (direction == Otc::South) {
-                        boneOffset.x -= 7;
-                        boneOffset.y -= 17;
+                    if (m_mount > 0) {
+                        if (direction == Otc::South) {
+                            boneOffset.x -= 7;
+                            boneOffset.y -= 17;
+                        }
+                        else if (direction == Otc::East) {
+                            boneOffset.x -= 18;
+                            boneOffset.y -= 7;
+                        }
                     }
-                    else if (direction == Otc::East) {
-                        boneOffset.x -= 18;
-                        boneOffset.y -= 7;
-                    }
+
+                    if (g_game.getFeature(Otc::GameWingOffset) && m_wings)
+                        boneOffset -= Point(6, 6);
+
+                    wingDest = dest + boneOffset * g_sprites.getOffsetFactor();
                 }
-
-                if (g_game.getFeature(Otc::GameWingOffset) && m_wings)
-                    boneOffset -= Point(6, 6);
-
-                wingDest = dest + boneOffset * g_sprites.getOffsetFactor();
             }
+            if (g_game.getFeature(Otc::GameWingOffset) && zPattern > 0) {
+                if (direction == Otc::East)
+                    wingDest -= Point(6, 2) * g_sprites.getOffsetFactor();
+                else
+                    wingDest -= Point(0, 6) * g_sprites.getOffsetFactor();
+            }
+            drawWings();
         }
-        if (g_game.getFeature(Otc::GameWingOffset) && zPattern > 0) {
-            if (direction == Otc::East)
-                wingDest -= Point(6, 2) * g_sprites.getOffsetFactor();
-            else
-                wingDest -= Point(0, 6) * g_sprites.getOffsetFactor();
-        }
-        drawWings();
     }
 
     Point center;
@@ -343,24 +353,27 @@ void Outfit::draw(Point dest, Otc::Direction direction, uint walkAnimationPhase,
         }
         if (g_game.getFeature(Otc::GameWingOffset) && zPattern > 0)
             wingDest += Point(4, 6);
-
-        drawWings();
+        if (g_game.creatureWingsIsVisible()) {
+            drawWings();
+        }
     }
     
     if (m_aura && (g_game.getFeature(Otc::GameDrawAuraOnTop) || g_game.getFeature(Otc::GameAuraFrontAndBack))) {
-        if (g_game.getFeature(Otc::GameAuraFrontAndBack)){
-            if (zPattern > 0) {
-                if (direction == Otc::East)
-                    topAuraDest -= Point(12, 6) * g_sprites.getOffsetFactor();
-                else if (direction == Otc::South)
-                    topAuraDest -= Point(1, 12) * g_sprites.getOffsetFactor();
-                else
-                    topAuraDest -= Point(4, 6) * g_sprites.getOffsetFactor();
+        if (g_game.creatureAurasIsVisible()) {
+            if (g_game.getFeature(Otc::GameAuraFrontAndBack)){
+                if (zPattern > 0) {
+                    if (direction == Otc::East)
+                        topAuraDest -= Point(12, 6) * g_sprites.getOffsetFactor();
+                    else if (direction == Otc::South)
+                        topAuraDest -= Point(1, 12) * g_sprites.getOffsetFactor();
+                    else
+                        topAuraDest -= Point(4, 6) * g_sprites.getOffsetFactor();
+                }
+                drawTopAura();
             }
-            drawTopAura();
-        }
-        else {
-            drawAura();
+            else {
+                drawAura();
+            }
         }
     }
 }
