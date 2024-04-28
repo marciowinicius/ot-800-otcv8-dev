@@ -128,3 +128,5 @@ _ReSharper*/
 *.[Rr]e[Ss]harper
 
 /vcpkg_installed
+vc16/vcpkg_installed/
+vc16/vcpkg_installed/*
