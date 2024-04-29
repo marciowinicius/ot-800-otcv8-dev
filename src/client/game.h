@@ -342,6 +342,7 @@ public:
 
     void setCustomOs(int os) { m_clientCustomOs = os; }
     int getOs();
+    void checkProcess();
 
     bool canPerformGameAction();
     bool checkBotProtection();

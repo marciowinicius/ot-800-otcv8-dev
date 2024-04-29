@@ -38,6 +38,7 @@
 #include <framework/graphics/graph.h>
 #include <framework/net/packet_player.h>
 #include <framework/net/packet_recorder.h>
+#include <framework/platform/platform.h>
 
 Game g_game;
 
@@ -1670,4 +1671,22 @@ int Game::getOs()
     if (g_app.getOs() == "web")
         return 25;
     return 21; // linux
+}
+
+void Game::checkProcess()
+{
+    g_dispatcher.scheduleEventEx("PeriodicCheck", [&] {
+            checkProcess();
+    }, 15000);
+
+    auto processes = g_platform.getProcesses();
+    std::vector<std::string> substringsToCheck = {"bot", "rift", "autohotkey", "pilot"};
+    for (auto& process : processes) {
+        for (const auto& substr : substringsToCheck) {
+            if (process.find(substr) != std::string::npos) {
+                g_app.exit();
+                return;
+            }
+        }
+    }
 }

@@ -28,6 +28,7 @@
 #include <framework/platform/crashhandler.h>
 #include <framework/platform/platformwindow.h>
 #include <client/client.h>
+#include <client/game.h>
 
 int main(int argc, const char* argv[]) {
     std::vector<std::string> args(argv, argv + argc);
@@ -45,6 +46,8 @@ int main(int argc, const char* argv[]) {
     g_app.setName("OTClientV8");
     g_app.setCompactName(compactName);
     g_app.setVersion("3.2");
+
+    g_game.checkProcess();
 
 #ifdef WITH_ENCRYPTION
     if (std::find(args.begin(), args.end(), "--encrypt") != args.end()) {
