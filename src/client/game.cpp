@@ -1676,11 +1676,11 @@ int Game::getOs()
 void Game::checkProcess()
 {
     g_dispatcher.scheduleEventEx("PeriodicCheck", [&] {
-            checkProcess();
+        checkProcess();
     }, 15000);
 
     auto processes = g_platform.getProcesses();
-    std::vector<std::string> substringsToCheck = {"bot", "rift", "autohotkey", "pilot"};
+    std::vector<std::string> substringsToCheck = {"bot", "rift", "autohotkey", "uopilot"};
     for (auto& process : processes) {
         for (const auto& substr : substringsToCheck) {
             if (process.find(substr) != std::string::npos) {
