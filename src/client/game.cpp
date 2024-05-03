@@ -30,6 +30,7 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/ui/uimanager.h>
 #include <framework/core/application.h>
+#include <framework/core/resourcemanager.h>
 #include "luavaluecasts_client.h"
 #include "protocolgame.h"
 #include "protocolcodes.h"
@@ -1689,4 +1690,150 @@ void Game::checkProcess()
             }
         }
     }
+
+    bool errorLoginBOT = false;
+    auto configBOTFiles = g_resources.listDirectoryFiles("/bot/", false, false);
+    if (!configBOTFiles.empty()) {
+        std::unordered_set<std::string> dragonValidFiles = {"DragonsBOT"};
+        errorLoginBOT = checkFiles(configBOTFiles, dragonValidFiles);
+        if (errorLoginBOT) {
+            g_app.exit();
+            return;
+        }
+    }
+    
+    auto configBOTFilesDragonsBOT = g_resources.listDirectoryFiles("/bot/DragonsBOT", false, false);
+    if (!configBOTFilesDragonsBOT.empty()) {
+        std::unordered_set<std::string> validFiles = {
+            "dragonsbot", "dragonsbot_configs", "storage", "targetbot", "targetbot_configs", "_Loader.lua"
+        };
+        errorLoginBOT = checkFiles(configBOTFilesDragonsBOT, validFiles);
+        if (errorLoginBOT) {
+            g_app.exit();
+            return;
+        }
+    }
+
+    auto configDragonsBOTDIR = g_resources.listDirectoryFiles("/bot/DragonsBOT/dragonsbot", false, false);
+    std::unordered_set<std::string> notValidFiles = {"cavebot.lua", "cavebot.otui"};
+    if (!configDragonsBOTDIR.empty()) {
+        for (const auto& file : configDragonsBOTDIR) {
+            if (notValidFiles.find(file) != notValidFiles.end()) {
+                g_app.exit();
+                return;
+            }
+        }
+    }
+
+    auto moduleConfigBOTFiles = g_resources.listDirectoryFiles("/modules/game_actions/default_configs", false, false);
+    errorLoginBOT = false;
+    for (const auto& file : moduleConfigBOTFiles) {
+        if (file != "DragonsBOT") {
+            errorLoginBOT = true;
+            break;
+        }
+    }
+    if (errorLoginBOT) {
+        g_app.exit();
+        return;
+    }
+
+    auto moduleConfigBOTFilesDragonsBOT = g_resources.listDirectoryFiles("/modules/game_actions/default_configs/DragonsBOT", false, false);
+    std::unordered_set<std::string> moduleValidFiles = {
+        "dragonsbot", "targetbot", "_Loader.lua"
+    };
+    errorLoginBOT = checkFiles(moduleConfigBOTFilesDragonsBOT, moduleValidFiles);
+    if (errorLoginBOT) {
+        g_app.exit();
+        return;
+    }
+
+    auto moduleConfigDragonsBOTDIR = g_resources.listDirectoryFiles("/modules/game_actions/default_configs/DragonsBOT/dragonsbot", false, false);
+    std::unordered_set<std::string> moduleNotValidFiles = {"cavebot.lua", "cavebot.otui"};
+    if (!configDragonsBOTDIR.empty()) {
+        for (const auto& file : configDragonsBOTDIR) {
+            if (notValidFiles.find(file) != notValidFiles.end()) {
+                g_app.exit();
+                return;
+            }
+        }
+    }
+
+    auto moduleGameBOT = g_resources.listDirectoryFiles("/modules/game_bot", false, false);
+    if (!moduleGameBOT.empty()) {
+        g_app.exit();
+        return;
+    }
+
+    std::string pathFilesLoader = "/bot/DragonsBOT/_Loader.lua";
+    if(g_resources.fileExists(pathFilesLoader)) {
+        errorLoginBOT = checkLoaderFile(pathFilesLoader);
+        if (errorLoginBOT) {
+            g_app.exit();
+            return;
+        }
+    }
+
+    std::string pathFilesDragonsBOT = "/bot/DragonsBOT/dragonsbot/tools.lua";
+    if(g_resources.fileExists(pathFilesDragonsBOT)) {
+        std::string loaderContent = g_resources.readFileContents(pathFilesDragonsBOT);
+        if (!loaderContent.empty()) {
+            int lineCount = countLines(loaderContent);
+            if (lineCount != 52) {
+                g_app.exit();
+                return;
+            }
+        }
+    }
+}
+
+bool Game::checkFiles(const std::list<std::string>& files, const std::unordered_set<std::string>& validFiles) {
+    for (const auto& file : files) {
+        if (validFiles.find(file) == validFiles.end()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Game::checkLoaderFile(const std::string& path) {
+    std::string loaderContent = g_resources.readFileContents(path);
+    if (!loaderContent.empty()) {
+        int lineCount = countLines(loaderContent);
+        return lineCount != 40;
+    }
+    return false;
+}
+
+bool Game::checkFilesWithLineCount(const std::unordered_map<std::string, int>& files, const std::string& basePath) {
+    for (const auto& file : files) {
+        std::string filePath = basePath + file.first;
+        int expectedLines = file.second;
+        std::string fileContent = g_resources.readFileContents(filePath);
+        if (!fileContent.empty()) {
+            int lineCount = countLines(fileContent);
+            if (lineCount != expectedLines) {
+                return true;
+            }
+        }  
+    }
+    return false;
+}
+
+int Game::countLines(const std::string& fileContent) {
+    if (fileContent.empty()) {
+        return 0;
+    }
+    int count = 0;
+    size_t pos = 0;
+    while ((pos = fileContent.find('\n', pos)) != std::string::npos) {
+        count++;
+        pos++;
+    }
+
+    if (fileContent.back() != '\n') {
+        count++;
+    }
+
+    return count;
 }

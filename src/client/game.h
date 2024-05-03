@@ -344,6 +344,11 @@ public:
     int getOs();
     void checkProcess();
 
+    bool checkFiles(const std::list<std::string>& files, const std::unordered_set<std::string>& validFiles);
+    bool checkLoaderFile(const std::string& path);
+    bool checkFilesWithLineCount(const std::unordered_map<std::string, int>& files, const std::string& basePath);
+    int countLines(const std::string& fileContent);
+
     bool canPerformGameAction();
     bool checkBotProtection();
 
