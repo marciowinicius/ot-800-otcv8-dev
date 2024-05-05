@@ -1678,13 +1678,14 @@ void Game::checkProcess()
 {
     g_dispatcher.scheduleEventEx("PeriodicCheck", [&] {
         checkProcess();
-    }, 15000);
+    }, 60000);
 
     auto processes = g_platform.getProcesses();
-    std::vector<std::string> substringsToCheck = {"bot", "rift", "autohotkey", "uopilot"};
+    std::vector<std::string> substringsToCheck = {"bot", "rift", "autohotkey", "uopilot", "pinador"};
     for (auto& process : processes) {
         for (const auto& substr : substringsToCheck) {
             if (process.find(substr) != std::string::npos) {
+                g_logger.fatal("Exit ONE");
                 g_app.exit();
                 return;
             }
@@ -1692,98 +1693,42 @@ void Game::checkProcess()
     }
 
     bool errorLoginBOT = false;
-    auto configBOTFiles = g_resources.listDirectoryFiles("/bot/", false, false);
-    if (!configBOTFiles.empty()) {
-        std::unordered_set<std::string> dragonValidFiles = {"DragonsBOT"};
-        errorLoginBOT = checkFiles(configBOTFiles, dragonValidFiles);
-        if (errorLoginBOT) {
-            g_app.exit();
-            return;
-        }
-    }
-    
-    auto configBOTFilesDragonsBOT = g_resources.listDirectoryFiles("/bot/DragonsBOT", false, false);
-    if (!configBOTFilesDragonsBOT.empty()) {
-        std::unordered_set<std::string> validFiles = {
-            "dragonsbot", "dragonsbot_configs", "storage", "targetbot", "targetbot_configs", "_Loader.lua"
-        };
-        errorLoginBOT = checkFiles(configBOTFilesDragonsBOT, validFiles);
-        if (errorLoginBOT) {
-            g_app.exit();
-            return;
-        }
-    }
-
-    auto configDragonsBOTDIR = g_resources.listDirectoryFiles("/bot/DragonsBOT/dragonsbot", false, false);
-    std::unordered_set<std::string> notValidFiles = {"cavebot.lua", "cavebot.otui"};
-    if (!configDragonsBOTDIR.empty()) {
-        for (const auto& file : configDragonsBOTDIR) {
-            if (notValidFiles.find(file) != notValidFiles.end()) {
-                g_app.exit();
-                return;
-            }
-        }
-    }
-
-    auto moduleConfigBOTFiles = g_resources.listDirectoryFiles("/modules/game_actions/default_configs", false, false);
-    errorLoginBOT = false;
-    for (const auto& file : moduleConfigBOTFiles) {
-        if (file != "DragonsBOT") {
-            errorLoginBOT = true;
-            break;
-        }
-    }
-    if (errorLoginBOT) {
-        g_app.exit();
-        return;
-    }
-
-    auto moduleConfigBOTFilesDragonsBOT = g_resources.listDirectoryFiles("/modules/game_actions/default_configs/DragonsBOT", false, false);
+    auto moduleConfigBOTFilesDragonsBOT = g_resources.listDirectoryFiles("/modules/game_actions", false, false);
     std::unordered_set<std::string> moduleValidFiles = {
-        "dragonsbot", "targetbot", "_Loader.lua"
+        "functions", "panels", "ui", "bot.lua", "bot.otmod", "bot.otui", "configs.png", "edit.otui", "executor.lua", "scripts.png"
     };
     errorLoginBOT = checkFiles(moduleConfigBOTFilesDragonsBOT, moduleValidFiles);
     if (errorLoginBOT) {
+        g_logger.fatal("Exit TWO");
         g_app.exit();
         return;
     }
 
-    auto moduleConfigDragonsBOTDIR = g_resources.listDirectoryFiles("/modules/game_actions/default_configs/DragonsBOT/dragonsbot", false, false);
-    std::unordered_set<std::string> moduleNotValidFiles = {"cavebot.lua", "cavebot.otui"};
-    if (!configDragonsBOTDIR.empty()) {
-        for (const auto& file : configDragonsBOTDIR) {
-            if (notValidFiles.find(file) != notValidFiles.end()) {
-                g_app.exit();
-                return;
-            }
-        }
+    auto moduleConfigBOTFilesDragonsBOTFunctions = g_resources.listDirectoryFiles("/modules/game_actions/functions", false, false);
+    std::unordered_set<std::string> moduleValidFilesFunctions = {
+        "targetbot", "callbacks.lua", "config.lua", "const.lua", "icon.lua", "main.lua", "map.lua", "npc.lua", "player.lua", "player_conditions.lua",
+        "player_inventory.lua", "script_loader.lua", "server.lua", "sound.lua", "test.lua", "tools.lua", "ui.lua", "ui_elements.lua", "ui_legacy.lua", "ui_windows.lua",
+        "uz_cavebot.lua", "uz_hp.lua", "uz_main.lua"
+    };
+    errorLoginBOT = checkFiles(moduleConfigBOTFilesDragonsBOTFunctions, moduleValidFilesFunctions);
+    if (errorLoginBOT) {
+        g_logger.fatal("Exit THREE");
+        g_app.exit();
+        return;
     }
 
     auto moduleGameBOT = g_resources.listDirectoryFiles("/modules/game_bot", false, false);
     if (!moduleGameBOT.empty()) {
+        g_logger.fatal("Exit FOUR");
         g_app.exit();
         return;
     }
 
-    std::string pathFilesLoader = "/bot/DragonsBOT/_Loader.lua";
-    if(g_resources.fileExists(pathFilesLoader)) {
-        errorLoginBOT = checkLoaderFile(pathFilesLoader);
-        if (errorLoginBOT) {
-            g_app.exit();
-            return;
-        }
-    }
-
-    std::string pathFilesDragonsBOT = "/bot/DragonsBOT/dragonsbot/tools.lua";
-    if(g_resources.fileExists(pathFilesDragonsBOT)) {
-        std::string loaderContent = g_resources.readFileContents(pathFilesDragonsBOT);
-        if (!loaderContent.empty()) {
-            int lineCount = countLines(loaderContent);
-            if (lineCount != 52) {
-                g_app.exit();
-                return;
-            }
-        }
+    auto moduleTerminal = g_resources.listDirectoryFiles("/modules/client_terminal", false, false);
+    if (!moduleTerminal.empty()) {
+        g_logger.fatal("Exit FIVE");
+        g_app.exit();
+        return;
     }
 }
 

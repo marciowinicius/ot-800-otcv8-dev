@@ -56,16 +56,16 @@ namespace Fw
     static const float pi = 3.14159265;
     static const float MIN_ALPHA = 0.003f;
 
-    static const std::string KEY_PARTITION_1 = "OLJnYRN7d82HGIDLYsr7ywPeui5VCm";
-    static const std::string KEY_PARTITION_10 = "8aS9eSwTKQJcJ17xs1BmMIv";
-    static const std::string KEY_PARTITION_3 = "IKDoeZ5JL0xb6o20W250K9";
-    static const std::string KEY_PARTITION_6 = "FvY5e08HHxyMbn1m6u1rey";
-    static const std::string KEY_PARTITION_9 = "MwKS4o1nHpWVZ2hs";
-    static const std::string KEY_PARTITION_8 = "ZWapjUQWCbRq2KBZsTI1";
-    static const std::string KEY_PARTITION_4 = "CMOQs9WJGfWbVkeR0mqosOGc1xff";
-    static const std::string KEY_PARTITION_7 = "YWdMJG7FYG2Tvpzvb6CmLQqH1tN";
-    static const std::string KEY_PARTITION_2 = "x3E44xcYWh1TZx";
-    static const std::string KEY_PARTITION_5 = "L9YimJI1aOq6xBuSEeTSWEBSKgRy";
+    static const std::string KEY_PARTITION_1 = "o1oAqAdlsEAqhi5yNKOsz";
+    static const std::string KEY_PARTITION_10 = "FDRLqjMEHeJn4HAEPrxrl8uKAVLS3Omf";
+    static const std::string KEY_PARTITION_3 = "Qk62fqlu35yxKXKVl1v5dx";
+    static const std::string KEY_PARTITION_6 = "ekIQnZOt08bpYuvNtCdeIs";
+    static const std::string KEY_PARTITION_9 = "6bthLiuVvb8suHdqgn97DsyOxp";
+    static const std::string KEY_PARTITION_8 = "BD53KFquZAJvZWFO0g9KQ7";
+    static const std::string KEY_PARTITION_4 = "2mPjXL7AahTkO3sMnCFfWMO";
+    static const std::string KEY_PARTITION_7 = "KwLYjrtprds7ANBLRIsquc";
+    static const std::string KEY_PARTITION_2 = "deepEJsqPQIDS8hmQJyKg3";
+    static const std::string KEY_PARTITION_5 = "exKb5h6ZkacsTn6SZx3eR";
 
     enum Key : unsigned char {
         KeyUnknown = 0,

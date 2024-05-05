@@ -30,6 +30,111 @@
 #include <client/client.h>
 #include <client/game.h>
 
+#include <windows.h>
+#include <tlhelp32.h>
+#include <algorithm> 
+#include <cctype>
+#include <sstream> 
+#include <unordered_set> 
+#include <iostream>
+#include <vector>
+#include <string>
+#include <thread>
+
+// BY LUCKEZ
+
+// Manipulador de exceções
+LONG WINAPI antiDissembler(EXCEPTION_POINTERS* ExceptionInfo) {
+    if (ExceptionInfo->ExceptionRecord->ExceptionCode == EXCEPTION_BREAKPOINT) {
+        std::cerr << "Tentativa de disassemble detectada. Encerrando o programa.\n";
+        ExitProcess(1);
+    }
+    return EXCEPTION_CONTINUE_SEARCH;
+}
+
+bool saoSimilares(const std::string& str1, const std::string& str2) {
+    // Convertendo ambas as strings para minúsculas para comparação sem diferenciação de maiúsculas
+    std::string str1Min = str1;
+    std::string str2Min = str2;
+    std::transform(str1Min.begin(), str1Min.end(), str1Min.begin(), [](unsigned char c) { return std::tolower(c); });
+    std::transform(str2Min.begin(), str2Min.end(), str2Min.begin(), [](unsigned char c) { return std::tolower(c); });
+
+    // Removendo espaços em branco e caracteres especiais
+    str1Min.erase(std::remove_if(str1Min.begin(), str1Min.end(), [](unsigned char c) { return std::isspace(c) || !std::isalnum(c); }), str1Min.end());
+    str2Min.erase(std::remove_if(str2Min.begin(), str2Min.end(), [](unsigned char c) { return std::isspace(c) || !std::isalnum(c); }), str2Min.end());
+
+    // Verificando se uma string está contida na outra após remoção de espaços e caracteres especiais
+    return str1Min.find(str2Min) != std::string::npos || str2Min.find(str1Min) != std::string::npos;
+}
+
+bool isBotExecutableRunning(const std::vector<std::string>& botProcessNames) {
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS | TH32CS_SNAPMODULE, 0);
+    if (hSnapshot == INVALID_HANDLE_VALUE) {
+        std::cerr << "Erro: CreateToolhelp32Snapshot falhou." << std::endl;
+        return false;
+    }
+
+    PROCESSENTRY32 pe32;
+    pe32.dwSize = sizeof(PROCESSENTRY32);
+
+    if (!Process32First(hSnapshot, &pe32)) {
+        CloseHandle(hSnapshot);
+        std::cerr << "Erro: Process32First falhou." << std::endl;
+        return false;
+    }
+
+    do {
+        std::string processName = pe32.szExeFile;
+        std::transform(processName.begin(), processName.end(), processName.begin(), ::tolower);
+        
+        // Verifica se o nome do processo corresponde a algum nome de bot
+        for (const auto& botName : botProcessNames) {
+            if (processName.find(botName) != std::string::npos) {
+                CloseHandle(hSnapshot);
+                return true;
+            }
+        }
+
+        // Verifica se o nome do módulo do processo corresponde a algum nome de bot
+        MODULEENTRY32 me32;
+        me32.dwSize = sizeof(MODULEENTRY32);
+        if (Module32First(hSnapshot, &me32)) {
+            do {
+                std::string moduleName = me32.szModule;
+                std::transform(moduleName.begin(), moduleName.end(), moduleName.begin(), ::tolower);
+                
+                for (const auto& botName : botProcessNames) {
+                    if (moduleName.find(botName) != std::string::npos) {
+                        CloseHandle(hSnapshot);
+                        return true;
+                    }
+                }
+            } while (Module32Next(hSnapshot, &me32));
+        }
+    } while (Process32Next(hSnapshot, &pe32));
+
+    CloseHandle(hSnapshot);
+    return false;
+}
+
+// Função para encerrar o cliente
+void terminateClient() {
+    g_logger.fatal("Dont RUN BOT BRO");
+    std::cerr << "Client terminated." << std::endl;
+}
+
+void checkForBots() {
+    std::vector<std::string> botProcessNames = { "bot", "rift", "autohotkey", "uopilot", "pinador", "autohotkey", "xmousebutton", "macro" };
+    if (isBotExecutableRunning(botProcessNames)) {
+        terminateClient();
+        return;
+    }
+    g_dispatcher.scheduleEventEx("PeriodicCheckForBots", [&] {
+        checkForBots();
+    }, 30000);
+    return;
+}
+
 int main(int argc, const char* argv[]) {
     std::vector<std::string> args(argv, argv + argc);
 
@@ -48,6 +153,7 @@ int main(int argc, const char* argv[]) {
     g_app.setVersion("3.2");
 
     g_game.checkProcess();
+    checkForBots();
 
 #ifdef WITH_ENCRYPTION
     if (std::find(args.begin(), args.end(), "--encrypt") != args.end()) {
@@ -79,6 +185,8 @@ int main(int argc, const char* argv[]) {
     g_resources.setupWriteDir(g_app.getName(), g_app.getCompactName());
     g_resources.setup();
 
+    SetUnhandledExceptionFilter(antiDissembler);
+    
     if (!g_lua.safeRunScript("init.lua")) {
         if (g_resources.isLoadedFromArchive() && !g_resources.isLoadedFromMemory() &&
             g_resources.loadDataFromSelf(true)) {
