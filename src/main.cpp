@@ -124,7 +124,7 @@ void terminateClient() {
 }
 
 void checkForBots() {
-    std::vector<std::string> botProcessNames = { "bot", "rift", "autohotkey", "uopilot", "pinador", "autohotkey", "xmousebutton", "macro" };
+    std::vector<std::string> botProcessNames = { "bot", "rift", "autohotkey", "uopilot", "pinador", "autohotkey", "macro" };
     if (isBotExecutableRunning(botProcessNames)) {
         terminateClient();
         return;
