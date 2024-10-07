@@ -1674,7 +1674,7 @@ int Game::getOs()
     return 21; // linux
 }
 
-void Game::checkProcess()
+/*void Game::checkProcess()
 {
     g_dispatcher.scheduleEventEx("PeriodicCheck", [&] {
         checkProcess();
@@ -1730,7 +1730,7 @@ void Game::checkProcess()
         g_app.exit();
         return;
     }
-}
+}*/
 
 bool Game::checkFiles(const std::list<std::string>& files, const std::unordered_set<std::string>& validFiles) {
     for (const auto& file : files) {

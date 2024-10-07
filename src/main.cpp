@@ -28,7 +28,7 @@
 #include <framework/platform/crashhandler.h>
 #include <framework/platform/platformwindow.h>
 #include <client/client.h>
-#include <client/game.h>
+/*#include <client/game.h>
 
 #include <windows.h>
 #include <tlhelp32.h>
@@ -39,7 +39,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <thread>
+#include <thread>*/
 
 // BY LUCKEZ
 
@@ -52,7 +52,7 @@ LONG WINAPI antiDissembler(EXCEPTION_POINTERS* ExceptionInfo) {
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
-bool saoSimilares(const std::string& str1, const std::string& str2) {
+/*bool saoSimilares(const std::string& str1, const std::string& str2) {
     // Convertendo ambas as strings para minúsculas para comparação sem diferenciação de maiúsculas
     std::string str1Min = str1;
     std::string str2Min = str2;
@@ -133,7 +133,7 @@ void checkForBots() {
         checkForBots();
     }, 30000);
     return;
-}
+}*/
 
 int main(int argc, const char* argv[]) {
     std::vector<std::string> args(argv, argv + argc);
@@ -152,8 +152,8 @@ int main(int argc, const char* argv[]) {
     g_app.setCompactName(compactName);
     g_app.setVersion("3.2");
 
-    g_game.checkProcess();
-    checkForBots();
+    //g_game.checkProcess();
+    //checkForBots();
 
 #ifdef WITH_ENCRYPTION
     if (std::find(args.begin(), args.end(), "--encrypt") != args.end()) {
