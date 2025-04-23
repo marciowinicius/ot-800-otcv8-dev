@@ -54,6 +54,7 @@ public:
     void setHealth(double health, double maxHealth);
     void setFreeCapacity(double freeCapacity);
     void setTotalCapacity(double totalCapacity);
+    void setHarmonyPoints(double totalCapacity);
     void setExperience(double experience);
     void setLevel(double level, double levelPercent);
     void setMana(double mana, double maxMana);

@@ -513,6 +513,14 @@ void LocalPlayer::setTotalCapacity(double totalCapacity)
     }
 }
 
+void LocalPlayer::setHarmonyPoints(int harmonyPoints)
+{
+    if(m_harmonyPoints != harmonyPoints) {
+        m_harmonyPoints = harmonyPoints;
+        callLuaField("onHarmonyPointsChange", m_harmonyPoints);
+    }
+}
+
 void LocalPlayer::setExperience(double experience)
 {
     if(m_experience != experience) {

@@ -29,8 +29,10 @@ experienceTooltip = 'You have %d%% to advance to level %d.'
 
 overlay = nil
 healthCircleFront = nil
+harmonyCircleFront = nil
 manaCircleFront = nil
 healthCircle = nil
+harmonyCircle = nil
 manaCircle = nil
 topHealthBar = nil
 topManaBar = nil
@@ -41,7 +43,8 @@ function init()
                          onLevelChange = onLevelChange,
                          onStatesChange = onStatesChange,
                          onSoulChange = onSoulChange,
-                         onFreeCapacityChange = onFreeCapacityChange })
+                         onFreeCapacityChange = onFreeCapacityChange,
+                         onHarmonyPointsChange = onHarmonyPointsChange })
 
   connect(g_game, { onGameEnd = offline })
 
@@ -65,8 +68,10 @@ function init()
 
   overlay = g_ui.createWidget('HealthOverlay', modules.game_interface.getMapPanel())  
   healthCircleFront = overlay:getChildById('healthCircleFront')
+  harmonyCircleFront = overlay:getChildById('harmonyCircleFront')
   manaCircleFront = overlay:getChildById('manaCircleFront')
   healthCircle = overlay:getChildById('healthCircle')
+  harmonyCircle = overlay:getChildById('harmonyCircle')
   manaCircle = overlay:getChildById('manaCircle')
   topHealthBar = overlay:getChildById('topHealthBar')
   topManaBar = overlay:getChildById('topManaBar')
@@ -86,6 +91,7 @@ function init()
     onStatesChange(localPlayer, localPlayer:getStates(), 0)
     onSoulChange(localPlayer, localPlayer:getSoul())
     onFreeCapacityChange(localPlayer, localPlayer:getFreeCapacity())
+    onHarmonyPointsChange(localPlayer, localPlayer:getHarmonyPoints())
   end
 
 
@@ -106,7 +112,8 @@ function terminate()
                             onLevelChange = onLevelChange,
                             onStatesChange = onStatesChange,
                             onSoulChange = onSoulChange,
-                            onFreeCapacityChange = onFreeCapacityChange })
+                            onFreeCapacityChange = onFreeCapacityChange,
+                            onHarmonyPointsChange = onHarmonyPointsChange })
 
   disconnect(g_game, { onGameEnd = offline })
   disconnect(overlay, { onGeometryChange = onOverlayGeometryChange })
@@ -192,6 +199,16 @@ function onHealthChange(localPlayer, health, maxHealth)
   else
     healthCircleFront:setImageColor("#850C0CFF")
   end
+end
+
+function onHarmonyPointsChange(localPlayer, harmonyPoints)
+  local Yhppc = math.floor(208 * (1 - ((harmonyPoints * 20) / 100)))
+  local rect = { x = 0, y = Yhppc, width = 63, height = 208 - Yhppc + 1 }
+  if harmonyCircleFront then
+    harmonyCircleFront:setImageClip(rect)
+    harmonyCircleFront:setImageRect(rect)
+  end
+  harmonyCircleFront:setImageColor("#A4951F")
 end
 
 function onManaChange(localPlayer, mana, maxMana)

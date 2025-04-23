@@ -198,6 +198,7 @@ private:
     void parseRemoveInventoryItem(const InputMessagePtr& msg);
     void parseOpenNpcTrade(const InputMessagePtr& msg);
     void parsePlayerGoods(const InputMessagePtr& msg);
+    void parsePlayerHarmonyPoints(const InputMessagePtr&);
     void parseCloseNpcTrade(const InputMessagePtr&);
     void parseWorldLight(const InputMessagePtr& msg);
     void parseMagicEffect(const InputMessagePtr& msg);

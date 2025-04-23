@@ -177,6 +177,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
             case Proto::GameServerPlayerGoods:
                 parsePlayerGoods(msg);
                 break;
+            case Proto::GameServerHarmonyPoints:
+                parsePlayerHarmonyPoints(msg);
+                break;
             case Proto::GameServerCloseNpcTrade:
                 parseCloseNpcTrade(msg);
                 break;
@@ -1411,6 +1414,12 @@ void ProtocolGame::parsePlayerGoods(const InputMessagePtr& msg)
     }
 
     g_game.processPlayerGoods(money, goods);
+}
+
+void ProtocolGame::parsePlayerHarmonyPoints(const InputMessagePtr&)
+{
+    uint8_t harmonyPoints = msg->getU8();
+    m_localPlayer->setHarmonyPoints(harmonyPoints);
 }
 
 void ProtocolGame::parseCloseNpcTrade(const InputMessagePtr&)
@@ -3516,6 +3525,8 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type)
                     msg->getU8(); // vocation id
             }
         }
+
+        
 
         if (g_game.getFeature(Otc::GameCreatureIcons)) {
             icon = msg->getU8();
