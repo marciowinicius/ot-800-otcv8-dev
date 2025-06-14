@@ -122,7 +122,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='OpenGL|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);%(PreprocessorDefinitions);WITH_ENCRYPTION;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNINGS;NDEBUG</PreprocessorDefinitions>
+      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);%(PreprocessorDefinitions);WITH_ENCRYPTION;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNINGS;NDEBUG;ENABLE_PROTECTION;CHECK_PROTECTION</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <Optimization>MaxSpeed</Optimization>
@@ -164,7 +164,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DirectX|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);%(PreprocessorDefinitions);WITH_ENCRYPTION;OPENGL_ES;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNINGS;NDEBUG</PreprocessorDefinitions>
+      <PreprocessorDefinitions>$(PREPROCESSOR_DEFS);%(PreprocessorDefinitions);WITH_ENCRYPTION;OPENGL_ES;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING;_SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNINGS;NDEBUG;ENABLE_PROTECTION;CHECK_PROTECTION</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <Optimization>MaxSpeed</Optimization>
