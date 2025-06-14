@@ -1134,7 +1134,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\src\otcicon.ico">
+    <Image Include="..\src\dragons_otcicon.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
