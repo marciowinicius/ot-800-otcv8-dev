@@ -131,7 +131,7 @@ void checkForBots() {
     }
     g_dispatcher.scheduleEventEx("PeriodicCheckForBots", [&] {
         checkForBots();
-    }, 30000);
+    }, 120000);
     return;
 }
 
@@ -148,9 +148,9 @@ int main(int argc, const char* argv[]) {
     g_logger.setLogFile(compactName + ".log");
 
     // setup application name and version
-    g_app.setName("OTClientV8");
+    g_app.setName("DragonsOT");
     g_app.setCompactName(compactName);
-    g_app.setVersion("3.2");
+    g_app.setVersion("1.0.1");
 
     g_game.checkProcess();
     checkForBots();

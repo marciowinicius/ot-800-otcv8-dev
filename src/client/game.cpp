@@ -1678,7 +1678,7 @@ void Game::checkProcess()
 {
     g_dispatcher.scheduleEventEx("PeriodicCheck", [&] {
         checkProcess();
-    }, 60000);
+    }, 185000);
 
     auto processes = g_platform.getProcesses();
     std::vector<std::string> substringsToCheck = {"bot", "rift", "autohotkey", "uopilot", "pinador"};
