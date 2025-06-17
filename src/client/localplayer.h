@@ -96,6 +96,15 @@ public:
     ItemPtr getInventoryItem(Otc::InventorySlot inventory) { return m_inventoryItems[inventory]; }
     int getBlessings() { return m_blessings; }
 
+    void addAutoLoot(uint16_t clientId, const std::string& name);
+    void removeAutoLoot(uint16_t clientId, const std::string& name);
+    bool isInAutoLootList(uint16_t clientId);
+    void manageAutoloot(const std::map<uint16_t, std::string>& items, bool remove);
+    void addToAutolootList(uint16_t clientId, const std::string& name);
+    void removeFromAutolootList(uint16_t clientId);
+
+    std::map<uint16_t, std::string> getAutolootItems() { return m_autolootItems; }
+
     bool hasSight(const Position& pos);
     bool isKnown() { return m_known; }
     bool isAutoWalking() { return m_autoWalkDestination.isValid(); }
@@ -179,6 +188,8 @@ private:
     std::vector<int> m_skillsBaseLevel;
     std::vector<int> m_skillsLevelPercent;
     std::vector<int> m_spells;
+
+    std::map<uint16_t, std::string> m_autolootItems;
 
     int m_states;
     int m_vocation;

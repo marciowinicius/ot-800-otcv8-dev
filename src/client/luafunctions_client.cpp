@@ -782,6 +782,10 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<LocalPlayer>("dumpWalkMatrix", &LocalPlayer::dumpWalkMatrix);
     g_lua.bindClassMemberFunction<LocalPlayer>("startServerWalking", &LocalPlayer::startServerWalking);
     g_lua.bindClassMemberFunction<LocalPlayer>("finishServerWalking", &LocalPlayer::finishServerWalking);
+    g_lua.bindClassMemberFunction<LocalPlayer>("removeAutoLoot", &LocalPlayer::removeAutoLoot);
+    g_lua.bindClassMemberFunction<LocalPlayer>("addAutoLoot", &LocalPlayer::addAutoLoot);
+    g_lua.bindClassMemberFunction<LocalPlayer>("isInAutoLootList", &LocalPlayer::isInAutoLootList);
+    g_lua.bindClassMemberFunction<LocalPlayer>("getAutolootItems", &LocalPlayer::getAutolootItems);
 
     g_lua.registerClass<Tile>();
     g_lua.bindClassMemberFunction<Tile>("clean", &Tile::clean);

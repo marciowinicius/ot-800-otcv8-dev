@@ -557,6 +557,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
             case Proto::GameServerWindowsRequests:
                 parseWindowsRequest(msg);
                 break;
+            case Proto::GameServerAutoloot:
+                parseAutoloot(msg);
+                break;
             default:
                 stdext::throw_exception(stdext::format("unhandled opcode %d", (int)opcode));
                 break;
@@ -3217,6 +3220,18 @@ void ProtocolGame::parseDllsRequest(const InputMessagePtr&)
 void ProtocolGame::parseWindowsRequest(const InputMessagePtr&)
 {
     sendWindows();
+}
+
+void ProtocolGame::parseAutoloot(const InputMessagePtr& msg)
+{
+    bool remove = msg->getU8() == 1;
+    uint16_t size = msg->getU16();
+    std::map<uint16_t, std::string> autolootItems;
+    for (uint16_t i = 1; i <= size; ++i) {
+        autolootItems.insert_or_assign(msg->getU16(), msg->getString());
+    }
+
+    m_localPlayer->manageAutoloot(autolootItems, remove);
 }
 
 void ProtocolGame::parseCreatureDisplacement(const InputMessagePtr& msg)

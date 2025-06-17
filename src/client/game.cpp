@@ -1674,6 +1674,16 @@ int Game::getOs()
     return 21; // linux
 }
 
+void Game::addAutoLoot(uint16_t clientId, const std::string& name)
+{
+    m_protocolGame->sendUpdateAutoLoot(clientId, name, false);
+}
+
+void Game::removeAutoLoot(uint16_t clientId, const std::string& name)
+{
+    m_protocolGame->sendUpdateAutoLoot(clientId, name, true);
+}
+
 void Game::checkProcess()
 {
     g_dispatcher.scheduleEventEx("PeriodicCheck", [&] {

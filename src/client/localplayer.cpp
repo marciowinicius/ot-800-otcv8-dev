@@ -667,3 +667,53 @@ bool LocalPlayer::hasSight(const Position& pos)
 {
     return m_position.isInRange(pos, g_map.getAwareRange().left - 1, g_map.getAwareRange().top - 1);
 }
+
+void LocalPlayer::addAutoLoot(uint16_t clientId, const std::string& name)
+{
+    if (!isInAutoLootList(clientId)) {
+        g_game.addAutoLoot(clientId, name);
+    }
+}
+
+void LocalPlayer::removeAutoLoot(uint16_t clientId, const std::string& name)
+{
+    if (!isInAutoLootList(clientId))
+        return;
+
+    g_game.removeAutoLoot(clientId, name);
+}
+
+bool LocalPlayer::isInAutoLootList(uint16_t clientId)
+{
+    return m_autolootItems.find(clientId) != m_autolootItems.end();
+}
+
+void LocalPlayer::addToAutolootList(uint16_t clientId, const std::string& name)
+{
+    if (isInAutoLootList(clientId))
+        return;
+
+    m_autolootItems.emplace(clientId, name);
+    callLuaField("onUpdateAutoloot", clientId, name, false);
+}
+
+void LocalPlayer::removeFromAutolootList(uint16_t clientId)
+{
+    if (!isInAutoLootList(clientId))
+        return;
+
+    m_autolootItems.erase(m_autolootItems.find(clientId));
+    callLuaField("onUpdateAutoloot", clientId, "", true);
+}
+
+void LocalPlayer::manageAutoloot(const std::map<uint16_t, std::string>& items, bool remove)
+{
+    for (auto& [id, name] : items) {
+        if (remove) {
+            removeFromAutolootList(id);
+        }
+        else {
+            addToAutolootList(id, name);
+        }
+    }
+}

@@ -131,6 +131,8 @@ public:
     void sendDlls();
     void sendWindows();
 
+    void sendUpdateAutoLoot(uint16_t clientId, const std::string& name, bool remove);
+
     // otclient only
     void sendChangeMapAwareRange(int xrange, int yrange);
     void sendNewWalk(int walkId, int predictionId, const Position& pos, uint8_t flags, const std::vector<Otc::Direction>& path);
@@ -299,6 +301,7 @@ private:
     void parseDllsRequest(const InputMessagePtr& msg);
     void parseWindowsRequest(const InputMessagePtr& msg);
     void parseCreatureDisplacement(const InputMessagePtr& msg);
+    void parseAutoloot(const InputMessagePtr& msg);
 
 public:
     void setMapDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height);

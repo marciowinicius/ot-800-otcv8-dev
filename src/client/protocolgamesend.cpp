@@ -1219,3 +1219,13 @@ void ProtocolGame::addPosition(const OutputMessagePtr& msg, const Position& posi
     msg->addU16(position.y);
     msg->addU8(position.z);
 }
+
+void ProtocolGame::sendUpdateAutoLoot(uint16_t clientId, const std::string& name, bool remove)
+{
+    OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientUpdateAutoLoot);
+    msg->addU16(clientId);
+    msg->addString(name);
+    msg->addU8(remove ? 0x01 : 0x00);
+    send(msg);
+}

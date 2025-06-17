@@ -352,6 +352,9 @@ public:
     bool canPerformGameAction();
     bool checkBotProtection();
 
+    void addAutoLoot(uint16_t clientId, const std::string& name);
+    void removeAutoLoot(uint16_t clientId, const std::string& name);
+
     bool isOnline() { return m_online; }
     bool isLogging() { return !m_online && m_protocolGame; }
     bool isDead() { return m_dead; }
