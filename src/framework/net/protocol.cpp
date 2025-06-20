@@ -222,13 +222,13 @@ void Protocol::internalRecvData(uint8* buffer, uint32 size)
             decompress = true;
         }
     } else if (m_checksumEnabled) {
-        if (m_inputMessage->peekU32() == 0) { // compressed data
+        /*if (m_inputMessage->peekU32() == 0) { // compressed data
             m_inputMessage->getU32();
             decompress = true;
         } else if (!m_inputMessage->readChecksum()) {
             g_logger.traceError(stdext::format("got a network message with invalid checksum, size: %i", (int)m_inputMessage->getMessageSize()));
             return;
-        }
+        }*/
     }
 
     if (m_xteaEncryptionEnabled) {
